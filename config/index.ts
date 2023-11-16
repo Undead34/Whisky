@@ -1,3 +1,21 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCVkOZDwhZO_NfKEdW-eqmPnj47ed1Niv8",
+  authDomain: "netready-red-team.firebaseapp.com",
+  projectId: "netready-red-team",
+  storageBucket: "netready-red-team.appspot.com",
+  messagingSenderId: "880253036837",
+  appId: "1:880253036837:web:22d3651fc8427a4d1a92cc",
+  measurementId: "G-5PJ0LDCCP5"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore();
+
 export default {
   title: "Iniciar sesión en la cuenta",
   description:
@@ -9,4 +27,6 @@ export default {
     redirect: "https://outlook.office.com/mail/",
     id: "client_id",
   },
+  app,
+  db
 };

@@ -51,7 +51,7 @@
 }
 
 .form-inputPrimary {
-  @apply h-9 w-full bg-transparent px-2.5 py-1.5 font-normal outline-none;
+  @apply h-9 w-full bg-transparent px-2.5 py-1.5 font-normal outline-none mb-2;
   @apply border border-solid border-[#00000099] text-[#1b1b1b];
   @apply border-l-0 border-r-0 border-t-0 pl-0;
   @apply focus:border-[#0067b8];
