@@ -30,5 +30,9 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  if (request.url.includes("/observer")) {
+    console.log("Image Query");
+  }
+
   return NextResponse.next();
 }

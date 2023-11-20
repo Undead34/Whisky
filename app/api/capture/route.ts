@@ -1,20 +1,19 @@
-import { collection, addDoc } from "firebase/firestore";
-import { NextRequest, NextResponse } from "next/server";
+import { increment, updateDoc } from "firebase/firestore";
+import { getDoc, doc, setDoc } from "firebase/firestore";
+import { NextResponse } from "next/server";
 import config, { db } from "@/config";
 import UAParser from "ua-parser-js";
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   const data = await req.json();
   const userAgent = new UAParser(String(req.headers.get("user-agent")));
+  const { url } = config;
 
-  // user meta data
+  // User Info
   const ip = req.headers.get("x-forwarded-for") || "N/A";
   const browser = userAgent.getBrowser();
   const os = userAgent.getOS();
-
-  const ipRes = await fetch(`http://ip-api.com/json/190.89.29.17`, {
-    method: "GET",
-  });
+  const ipRes = await fetch(`http://ip-api.com/json/${ip}`, { method: "GET" });
   const ipData = await ipRes.json();
 
   const info = {
@@ -36,16 +35,26 @@ export async function POST(req: Request, res: Response) {
   };
 
   try {
-    const docRef = await addDoc(collection(db, "users"), info);
-    console.log("Document written with ID: ", docRef.id);
-    return NextResponse.json(
-      { status: "success", redirect: config.url.redirect },
-      { status: 200 }
-    );
+    const docRef = doc(db, "cities", info.id);
+
+    if ((await getDoc(docRef)).exists()) {
+      await updateDoc(docRef, { clicks: increment(1) });
+      return NextResponse.json({
+        status: "success",
+        redirect: url.redirect,
+      });
+    }
+
+    await setDoc(docRef, info);
+
+    return NextResponse.json({
+      status: "success",
+      redirect: url.redirect,
+    });
   } catch (e) {
     console.error("Error adding document: ", e);
     return NextResponse.json(
-      { status: "fail", redirect: config.url.redirect },
+      { status: "fail", redirect: url.redirect },
       { status: 401 }
     );
   }
