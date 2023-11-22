@@ -21,7 +21,7 @@ export async function GET(req: Request) {
   // send mail with defined transport object
   const info = await transporter.sendMail({
     from: process.env.MAILER_USER || "maizogabriel@gmail.com",
-    to: "balarcon@netreadysolutions.com",
+    to: ["maizogabriel@gmail.com"],
     subject: "Hello",
     html: html,
   });

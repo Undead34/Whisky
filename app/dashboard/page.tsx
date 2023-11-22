@@ -1,4 +1,5 @@
 import ChartDoughnut from "./components/ChartDoughnut";
+import Tables from "./components/Table";
 
 export default function Page() {
   return (
@@ -61,23 +62,26 @@ export default function Page() {
         </div>
       </div>
 
-      <div>{/* <Tables values={data}></Tables> */}</div>
+      <div>
+        <Tables values={[]}></Tables>
+      </div>
     </div>
   );
 }
 
-{
-  /* <ChartDoughnut
-              data={{
-                sent: statistics.captured_info_no_send,
-                failed: statistics.captured_info,
-              }}
-              labels={}
-              text={`${statistics.captured_info}/${
-                statistics.mails_delivered + statistics.mails_delivered_no_send
-              }`}
-            /> */
-}
+
+// {
+//   /* <ChartDoughnut
+//               data={{
+//                 sent: statistics.captured_info_no_send,
+//                 failed: statistics.captured_info,
+//               }}
+//               labels={}
+//               text={`${statistics.captured_info}/${
+//                 statistics.mails_delivered + statistics.mails_delivered_no_send
+//               }`}
+//             /> */
+// }
 
 // import { onSnapshot, doc, collection } from "firebase/firestore";
 

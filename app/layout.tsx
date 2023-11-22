@@ -7,9 +7,9 @@ export const metadata: Metadata = {
   description: config.description,
 };
 
-export default function RootLayout({ children }: IProps) {
+export default function Layout({ children }: IProps) {
   return (
-    <html dir="ltr" lang="ES-ES">
+    <html dir="ltr" lang="es-ES">
       <body>{children}</body>
     </html>
   );

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: any) {
   return (
-    <html lang="es">
+    <html lang="es-ES" dir="ltr">
       <body className={NotoSans.className}>
         <main className="flex">
           <Sidebar />
