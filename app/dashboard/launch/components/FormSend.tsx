@@ -1,38 +1,32 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { toast } from "sonner";
 
 export default function FormSend() {
-  async function onSubmit(event: any) {
+  const [targets, setTargets] = useState(
+    "Jhon Doe,jhondoe@example.com\nJane Doe,janedoe@example.com"
+  );
+  const [lotName, setLotName] = useState("");
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const data = event.target.targets.value.trim();
-    const lotName = event.target.lot_name.value.trim();
 
-    const res = fetch("/api/upload", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: data, name: lotName }),
-    });
+    try {
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: targets.trim(), name: lotName.trim() }),
+      });
 
-    const promise = new Promise((resolver, reject) => {
-      res
-        .then((data) => {
-          if (!data.ok) reject(true);
-          resolver(true);
-        })
-        .catch(() => {
-          reject(true);
-        });
-    });
+      if (!response.ok) {
+        throw new Error("Request failed");
+      }
 
-    toast.promise(promise, {
-      loading: "Loading...",
-      success: () => {
-        return "Datos cargados correctamente";
-      },
-      error: "Error al cargar los datos",
-    });
+      toast.success("Datos cargados correctamente");
+    } catch (error) {
+      toast.error("Error al cargar los datos");
+    }
   }
 
   return (
@@ -40,14 +34,13 @@ export default function FormSend() {
       <label htmlFor="targets">Escribir una lista de objetivos</label>
       <textarea
         className="w-full rounded-sm border border-blue-400 p-2 text-black outline-none focus:border-blue-500"
-        name="targets"
+        onChange={(e) => setTargets(e.target.value)}
         aria-describedby="textarea_input_help"
+        name="targets"
         id="targets"
         rows={5}
-        defaultValue={
-          "Jhon Doe,jhondoe@example.com\nJane Doe,janedoe@example.com"
-        }
         required
+        defaultValue={targets}
       ></textarea>
       <p className="text-sm" id="textarea_input_help">
         Por favor, escriba la lista de objetivos escribiendo el nombre una coma
@@ -55,10 +48,12 @@ export default function FormSend() {
       </p>
       <input
         className="w-full rounded-sm border border-blue-400 p-2 text-black outline-none focus:border-blue-500"
+        onChange={(e) => setLotName(e.target.value)}
         type="text"
         name="lot_name"
-        placeholder="Nombre del lote de objetivos"
+        id="lot_name"
         autoComplete="off"
+        placeholder="Nombre del lote de objetivos"
         required
       />
       <div className="flex justify-end">

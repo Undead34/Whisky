@@ -4,54 +4,39 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 export default function UploadForm() {
-  const [file, setFile] = useState<File>();
+  const [file, setFile] = useState<File | null>(null);
 
-  const onSubmit = (e: any) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const lotName: string = e.target.lot_name.value.trim();
+    const lotName = e.currentTarget.lot_name.value.trim();
     if (!file) return;
 
-    try {
-      const data = new FormData();
+    if (
+      file.size > 150000000 ||
+      !["text/plain", "text/csv"].includes(file.type)
+    ) {
+      toast.error("Archivo inválido o demasiado grande.");
+      return;
+    }
 
-      if (
-        file.size > 150000000 ||
-        !["text/plain", "text/csv"].includes(file.type)
-      ) {
-        return;
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("lotName", lotName);
+
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al cargar el archivo");
       }
 
-      data.set("file", file);
-      data.set("lotName", lotName);
-
-      const res = fetch("/api/upload", {
-        method: "POST",
-        body: data,
-      });
-
-      const promise = new Promise((resolver, reject) => {
-        res
-          .then((data) => {
-            if (!data.ok) reject(true);
-            resolver(true);
-          })
-          .catch(() => {
-            reject(true);
-          });
-      });
-
-      toast.promise(promise, {
-        loading: "Loading...",
-        success: () => {
-          return "Archivo cargado correctamente";
-        },
-        error: "Error al cargar el archivo",
-      });
-
-      // handle the error
-    } catch (e: any) {
-      // Handle errors here
-      console.error(e);
+      toast.success("Archivo cargado correctamente");
+    } catch (error) {
+      toast.error("Error al cargar el archivo");
+      console.error(error);
     }
   };
 
@@ -66,7 +51,7 @@ export default function UploadForm() {
         id="file_input"
         type="file"
         accept=".txt,.csv"
-        onChange={(e) => setFile(e.target.files?.[0])}
+        onChange={(e) => setFile(e.target.files?.[0] || null)}
       />
       <p className="!text-sm" id="file_input_help">
         CSV or TXT (MAX. 150MB).
@@ -75,6 +60,7 @@ export default function UploadForm() {
         className="w-full rounded-sm border border-blue-400 p-2 text-black outline-none focus:border-blue-500"
         type="text"
         name="lot_name"
+        id="lot_name"
         placeholder="Nombre del lote de objetivos"
         required
         autoComplete="off"
@@ -90,3 +76,67 @@ export default function UploadForm() {
     </form>
   );
 }
+
+// "use client";
+
+// import { useState } from "react";
+// import { toast } from "sonner";
+
+// export default function UploadForm() {
+//   const [file, setFile] = useState<File>();
+
+//   const onSubmit = (e: any) => {
+//     e.preventDefault();
+//     const lotName: string = e.target.lot_name.value.trim();
+//     if (!file) return;
+
+//     try {
+//       const data = new FormData();
+
+//       if (
+//         file.size > 150000000 ||
+//         !["text/plain", "text/csv"].includes(file.type)
+//       ) {
+//         return;
+//       }
+
+//       data.set("file", file);
+//       data.set("lotName", lotName);
+
+//       const res = fetch("/api/upload", {
+//         method: "POST",
+//         body: data,
+//       });
+
+//       const promise = new Promise((resolver, reject) => {
+//         res
+//           .then((data) => {
+//             if (!data.ok) reject(true);
+//             resolver(true);
+//           })
+//           .catch(() => {
+//             reject(true);
+//           });
+//       });
+
+//       toast.promise(promise, {
+//         loading: "Loading...",
+//         success: () => {
+//           return "Archivo cargado correctamente";
+//         },
+//         error: "Error al cargar el archivo",
+//       });
+
+//       // handle the error
+//     } catch (e: any) {
+//       // Handle errors here
+//       console.error(e);
+//     }
+//   };
+
+//   return (
+//     <form onSubmit={onSubmit} className="flex flex-col gap-4">
+//
+//     </form>
+//   );
+// }

