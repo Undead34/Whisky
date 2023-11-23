@@ -2,13 +2,9 @@
 
 import React from "react";
 
-import * as ReactTable from "@table-library/react-table-library/table";
-
 import {
   Table,
-  Header,
   HeaderRow,
-  Body,
   Row,
   HeaderCell,
   Cell,
@@ -17,7 +13,7 @@ import { Virtualized } from "@table-library/react-table-library/virtualized";
 import { useTree, CellTree } from "@table-library/react-table-library/tree";
 import { getTheme } from "@table-library/react-table-library/baseline";
 import { useTheme } from "@table-library/react-table-library/theme";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { v4 as uuid } from "uuid";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa6";

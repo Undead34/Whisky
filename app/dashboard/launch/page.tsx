@@ -1,4 +1,4 @@
-// import TargetsUsers from "./components/TargetsUsers";
+import TargetsUsers from "./components/TargetsUsers";
 import UploadForm from "./components/UploadForm";
 import FormSend from "./components/FormSend";
 import React from "react";
@@ -16,7 +16,9 @@ export default async function Launch() {
         <UploadForm />
       </div>
 
-      <div className="mb-20 flex flex-1 flex-col">{/* <TargetsUsers /> */}</div>
+      <div className="mb-20 flex flex-1 flex-col">
+        <TargetsUsers />
+      </div>
     </div>
   );
 }
