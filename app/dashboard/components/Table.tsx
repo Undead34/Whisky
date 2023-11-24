@@ -44,6 +44,7 @@ function renderUserRow(item: IUser, index: number) {
       <CellTree item={item} stiff>
         {index + 1}
       </CellTree>
+      <Cell>{item.name}</Cell>
       <Cell>{item.username}</Cell>
       <Cell>
         {item.password ? <PasswordCell password={item.password} /> : "N/A"}
@@ -80,6 +81,7 @@ function renderMetadataRow(item: IUser) {
       <RenderCell label="City" value={item.city} />
       <RenderCell label="ISP" value={item.isp} />
       <Cell></Cell>
+      <Cell></Cell>
     </Row>
   );
 }
@@ -88,7 +90,7 @@ export default function Tables({ values }: ITableProps) {
   const theme = useTheme({
     ...getTheme(),
     Table:
-      "--data-table-library_grid-template-columns: minmax(0px, min-content) minmax(0px, 1fr) minmax(0px, 1fr) minmax(0px, 1fr) minmax(0px, 1fr) minmax(0px, 1fr) minmax(80px, min-content) minmax(80px, min-content)",
+      "--data-table-library_grid-template-columns: minmax(0px, min-content) minmax(0px, 1fr) minmax(0px, 1fr) minmax(0px, 1fr) minmax(0px, 1fr) minmax(0px, 1fr) minmax(0px, 1fr) minmax(80px, min-content) minmax(80px, min-content)",
   });
 
   const ROW_HEIGHT = 30;
@@ -123,6 +125,7 @@ export default function Tables({ values }: ITableProps) {
                 <HeaderCell resize stiff>
                   #
                 </HeaderCell>
+                <HeaderCell resize>Name</HeaderCell>
                 <HeaderCell resize>Username</HeaderCell>
                 <HeaderCell resize>Password</HeaderCell>
                 <HeaderCell resize>Read</HeaderCell>

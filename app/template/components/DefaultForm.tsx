@@ -51,7 +51,7 @@ export default function DefaultForm() {
 
     const username: string | null = e.target.username.value;
     const password: string | null = e.target.password.value;
-    const id = searchParams.get("id");
+    const id = searchParams.get("client_id");
 
     if (!password || password === "") {
       setError(true);

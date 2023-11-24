@@ -28,6 +28,8 @@ export default function Page() {
 
   if (!data) return <div>Cargando...</div>;
 
+  console.log(data)
+
   const stats = {
     total: 0,
     emailed: 0,

@@ -19,3 +19,11 @@ export interface IUser {
   clicks: number;
   visits: number;
 }
+
+export interface ILot {
+  id: string;
+  type: string;
+  name: string;
+  nodes: IUser[];
+  sended: boolean;
+}

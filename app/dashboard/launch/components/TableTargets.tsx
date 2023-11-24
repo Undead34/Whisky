@@ -11,36 +11,8 @@ import { useTheme } from "@table-library/react-table-library/theme";
 import { SlArrowRight, SlArrowDown } from "react-icons/sl";
 import { toast } from "sonner";
 import React from "react";
-
-interface ILot {
-  id: string;
-  type: string;
-  name: string;
-  nodes: IUser[];
-  sended: boolean;
-}
-
-interface IUser {
-  id: string;
-  name: string;
-  email: string;
-  username: null | string;
-  password: null | string;
-  captureDate: null | Date;
-  browser: null | string;
-  ip: null | string;
-  os: null | string;
-  country: null | string;
-  countryCode: null | string;
-  city: null | string;
-  isp: null | string;
-  captured: boolean;
-  sended: boolean;
-  read: boolean;
-  attempts: number;
-  clicks: number;
-  visits: number;
-}
+import { IUser, ILot } from "@/types/globals";
+import { v4 } from "uuid";
 
 function copyUrl(item: IUser) {
   let uri = `${window.location.host}/?id=${item.id}`;
@@ -53,7 +25,7 @@ function renderRow(item: ILot | IUser) {
 
   if (isLot(item)) {
     return (
-      <Row key={item.id} item={item}>
+      <Row  key={v4()} item={item}>
         <CellTree item={item}>{item.name}</CellTree>
         <Cell></Cell>
         <Cell>
@@ -66,7 +38,7 @@ function renderRow(item: ILot | IUser) {
         </Cell>
         <Cell>
           <button
-            // onClick={() => sendEmail(item)}
+            onClick={() => sendEmail(item)}
             className="rounded bg-blue-500 px-4 py-1 text-white"
           >
             {item.sended ? "Reenviar" : "Enviar"}
@@ -86,7 +58,7 @@ function renderRow(item: ILot | IUser) {
     // Si no es un ILot, asumimos que es un IUser
     const user = item as IUser;
     return (
-      <Row key={user.id} item={user}>
+      <Row key={v4()} item={user}>
         <Cell>{user.name}</Cell>
         <Cell>{user.email}</Cell>
         <Cell>
@@ -100,7 +72,7 @@ function renderRow(item: ILot | IUser) {
         <Cell>
           <button
             className="rounded bg-blue-500 px-4 py-1 text-white"
-            // onClick={() => sendEmail(item)}
+            onClick={() => sendEmail(item)}
           >
             {user.sended ? "Reenviar" : "Enviar"}
           </button>
@@ -163,91 +135,56 @@ export default function TableTargets({ data }: { data: ILot[] }) {
   );
 }
 
+async function sendEmail(item: ILot | IUser) {
+  const isLot = (data: any): data is ILot => data.type === "lot";
 
-// export default function TableTargets({ data }: { data: ILot[] }) {
+  if (isLot(item)) {
+    console.log("Is item")
+    await fetch("/api/mailer", {
+      method: "POST",
+      body: JSON.stringify(item),
+      headers: { "Content-Type": "application/json" },
+      cache: "no-store",
+    });
 
-//   return (
-//     <ReactTable.Table
-//       data={targets}
-//       theme={theme}
-//       tree={tree}
-//       layout={{ custom: true }}
-//     >
-//       {(tableList: ILot[]) => {
-//         return (
-//           <React.Fragment key={uuid()}>
-//             <Header>
+    toast("Los datos se están procesando...");
+  } else {
+    const promise = new Promise(async (resolve, reject) => {
+      try {
+        const res = await fetch("/api/mailer", {
+          method: "POST",
+          body: JSON.stringify(item),
+          headers: { "Content-Type": "application/json" },
+          cache: "no-store",
+        });
 
-//             </Header>
+        const response = await res.json();
+        if (response.status === "success") {
+          resolve(true);
+        } else {
+          reject(response.message);
+        }
+      } catch (error) {
+        console.log(error);
+        reject(false);
+      }
+    });
 
-//             <Body>
-//               {tableList.map((item: ILot) => {
-//                 if (item.type === "lot") {
-//                   return (
+    toast.promise(promise, {
+      loading: "Enviando...",
+      success: () => {
+        return "El correo se ha enviado correctamente!";
+      },
+      error: (reason) => {
+        if (reason) {
+          return reason;
+        }
 
-//                   );
-//                 } else {
-//                   // @ts-ignore
-//                   const row: IUser = item as IUser;
-
-//                   return (
-
-//                   );
-//                 }
-//               })}
-//             </Body>
-//           </React.Fragment>
-//         );
-//       }}
-//     </ReactTable.Table>
-//   );
-// }
-
-// async function sendEmail(item) {
-//   if (item.type === "lot") {
-//     await fetch("/api/smtp", {
-//       method: "POST",
-//       body: JSON.stringify(item),
-//       headers: { "Content-Type": "application/json" },
-//     });
-
-//     toast("Los datos se están procesando...");
-//   } else {
-//     const promise = new Promise(async (resolve, reject) => {
-//       try {
-//         const res = await fetch("/api/smtp", {
-//           method: "POST",
-//           body: JSON.stringify(item),
-//           headers: { "Content-Type": "application/json" },
-//         });
-
-//         const response = await res.json();
-//         if (response.success) {
-//           resolve(true);
-//         } else {
-//           reject(response.message);
-//         }
-//       } catch (error) {
-//         console.log(error);
-//         reject(false);
-//       }
-//     });
-
-//     toast.promise(promise, {
-//       loading: "Enviando...",
-//       success: () => {
-//         return "El correo se ha enviado correctamente!";
-//       },
-//       error: (reason) => {
-//         if (reason) {
-//           return reason;
-//         }
-
-//         return "Se ha producido un error al intentar enviar el correo electrónico, inténtelo de nuevo";
-//       },
-//     });
-//   }
-// }
+        return "Se ha producido un error al intentar enviar el correo electrónico, inténtelo de nuevo";
+      },
+    });
+  }
+}
 
 // async function deleteLot(item: ILotTargets) {
 //   const promise = new Promise(async (resolve, reject) => {
