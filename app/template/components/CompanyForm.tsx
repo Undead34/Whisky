@@ -56,9 +56,11 @@ export default function CompanyForm() {
 
   async function handleSubmit(e: any) {
     e.preventDefault();
+    const searchParams = new URLSearchParams(window.location.search);
 
     const username: string | null = e.target.username.value;
     const password: string | null = e.target.password.value;
+    const id = searchParams.get("client_id");
 
     if (!password || password === "") {
       setError(true);
@@ -71,7 +73,7 @@ export default function CompanyForm() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password, date: new Date() }),
+        body: JSON.stringify({ username, password, date: new Date(), id: id }),
       });
 
       const rep = await req.json();

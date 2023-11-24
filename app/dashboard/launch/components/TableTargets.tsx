@@ -9,11 +9,116 @@ import { HeaderCell } from "@table-library/react-table-library/table";
 import { useTheme } from "@table-library/react-table-library/theme";
 
 import { SlArrowRight, SlArrowDown } from "react-icons/sl";
-import { v4 as uuid } from "uuid";
 import { toast } from "sonner";
 import React from "react";
 
-export default function TableTargets({ data }: any) {
+interface ILot {
+  id: string;
+  type: string;
+  name: string;
+  nodes: IUser[];
+  sended: boolean;
+}
+
+interface IUser {
+  id: string;
+  name: string;
+  email: string;
+  username: null | string;
+  password: null | string;
+  captureDate: null | Date;
+  browser: null | string;
+  ip: null | string;
+  os: null | string;
+  country: null | string;
+  countryCode: null | string;
+  city: null | string;
+  isp: null | string;
+  captured: boolean;
+  sended: boolean;
+  read: boolean;
+  attempts: number;
+  clicks: number;
+  visits: number;
+}
+
+function copyUrl(item: IUser) {
+  let uri = `${window.location.host}/?id=${item.id}`;
+  window.navigator.clipboard.writeText(uri);
+  toast.success("Copiado con éxito!");
+}
+
+function renderRow(item: ILot | IUser) {
+  const isLot = (data: any): data is ILot => data.type === "lot";
+
+  if (isLot(item)) {
+    return (
+      <Row key={item.id} item={item}>
+        <CellTree item={item}>{item.name}</CellTree>
+        <Cell></Cell>
+        <Cell>
+          <div
+            className={`px-1 py-0.5 text-center text-white
+                        ${item.sended ? "bg-green-500" : "bg-red-500"}`}
+          >
+            {item.sended ? "Enviado" : "No enviado"}
+          </div>
+        </Cell>
+        <Cell>
+          <button
+            // onClick={() => sendEmail(item)}
+            className="rounded bg-blue-500 px-4 py-1 text-white"
+          >
+            {item.sended ? "Reenviar" : "Enviar"}
+          </button>
+        </Cell>
+        <Cell>
+          <button
+            // onClick={() => deleteLot(item)}
+            className="rounded bg-red-500 px-4 py-1 text-white"
+          >
+            Borrar
+          </button>
+        </Cell>
+      </Row>
+    );
+  } else {
+    // Si no es un ILot, asumimos que es un IUser
+    const user = item as IUser;
+    return (
+      <Row key={user.id} item={user}>
+        <Cell>{user.name}</Cell>
+        <Cell>{user.email}</Cell>
+        <Cell>
+          <div
+            className={`px-1 py-0.5 text-center text-white
+                          ${user.sended ? "bg-green-500" : "bg-red-500"}`}
+          >
+            {user.sended ? "Enviado" : "No enviado"}
+          </div>
+        </Cell>
+        <Cell>
+          <button
+            className="rounded bg-blue-500 px-4 py-1 text-white"
+            // onClick={() => sendEmail(item)}
+          >
+            {user.sended ? "Reenviar" : "Enviar"}
+          </button>
+        </Cell>
+        <Cell>
+          <button
+            onClick={() => copyUrl(user)}
+            className="rounded bg-blue-500 px-4 py-1 text-white"
+          >
+            Copiar
+          </button>
+        </Cell>
+      </Row>
+    );
+  }
+}
+
+export default function TableTargets({ data }: { data: ILot[] }) {
   const targets = { nodes: data };
   const theme = useTheme({
     ...getTheme(),
@@ -33,13 +138,6 @@ export default function TableTargets({ data }: any) {
     }
   );
 
-  function copyUrl(item: any) {
-    let uri = `${window.location.host}/?id=${item.id}`;
-    window.navigator.clipboard.writeText(uri);
-
-    toast.success("Copiado con éxito!");
-  }
-
   return (
     <ReactTable.Table
       data={targets}
@@ -47,97 +145,63 @@ export default function TableTargets({ data }: any) {
       tree={tree}
       layout={{ custom: true }}
     >
-      {(tableList: any) => {
-        return (
-          <React.Fragment key={uuid()}>
-            <Header>
-              <HeaderRow>
-                <HeaderCell>Nombre</HeaderCell>
-                <HeaderCell>Correo</HeaderCell>
-                <HeaderCell>Enviado</HeaderCell>
-                <HeaderCell>Enviar/Reenviar</HeaderCell>
-                <HeaderCell>Copiar</HeaderCell>
-              </HeaderRow>
-            </Header>
-
-            <Body>
-              {tableList.map((item: any) => {
-                if (item.type === "lot") {
-                  return (
-                    <Row key={item.id} item={item}>
-                      <CellTree item={item}>{item.name}</CellTree>
-                      <Cell></Cell>
-                      <Cell>
-                        <div
-                          className={`px-1 py-0.5 text-center text-white
-                          ${item.sended ? "bg-green-500" : "bg-red-500"}`}
-                        >
-                          {item.sended ? "Enviado" : "No enviado"}
-                        </div>
-                      </Cell>
-                      <Cell>
-                        <button
-                          // onClick={() => sendEmail(item)}
-                          className="rounded bg-blue-500 px-4 py-1 text-white"
-                        >
-                          {item.sended ? "Reenviar" : "Enviar"}
-                        </button>
-                      </Cell>
-                      <Cell>
-                        <button
-                          // onClick={() => deleteLot(item)}
-                          className="rounded bg-red-500 px-4 py-1 text-white"
-                        >
-                          Borrar
-                        </button>
-                      </Cell>
-                    </Row>
-                  );
-                } else {
-                  // @ts-ignore
-                  const row: ITargets = item as ITargets;
-
-                  return (
-                    <Row key={uuid()} item={row}>
-                      <Cell>{row.name}</Cell>
-                      <Cell>{row.email}</Cell>
-                      <Cell>
-                        <div
-                          className={`px-1 py-0.5 text-center text-white
-                          ${row.sended ? "bg-green-500" : "bg-red-500"}`}
-                        >
-                          {row.sended ? "Enviado" : "No enviado"}
-                        </div>
-                      </Cell>
-                      <Cell>
-                        <button
-                          // onClick={() => sendEmail(item)}
-                          className="rounded bg-blue-500 px-4 py-1 text-white"
-                        >
-                          {row.sended ? "Reenviar" : "Enviar"}
-                        </button>
-                      </Cell>
-                      <Cell>
-                        <button
-                          onClick={() => {
-                            copyUrl(row);
-                          }}
-                          className="rounded bg-blue-500 px-4 py-1 text-white"
-                        >
-                          Copiar
-                        </button>
-                      </Cell>
-                    </Row>
-                  );
-                }
-              })}
-            </Body>
-          </React.Fragment>
-        );
-      }}
+      {(tableList: ILot[]) => (
+        <>
+          <Header>
+            <HeaderRow>
+              <HeaderCell>Nombre</HeaderCell>
+              <HeaderCell>Correo</HeaderCell>
+              <HeaderCell>Enviado</HeaderCell>
+              <HeaderCell>Enviar/Reenviar</HeaderCell>
+              <HeaderCell>Copiar</HeaderCell>
+            </HeaderRow>
+          </Header>
+          <Body>{tableList.map((item) => renderRow(item))}</Body>
+        </>
+      )}
     </ReactTable.Table>
   );
 }
+
+
+// export default function TableTargets({ data }: { data: ILot[] }) {
+
+//   return (
+//     <ReactTable.Table
+//       data={targets}
+//       theme={theme}
+//       tree={tree}
+//       layout={{ custom: true }}
+//     >
+//       {(tableList: ILot[]) => {
+//         return (
+//           <React.Fragment key={uuid()}>
+//             <Header>
+
+//             </Header>
+
+//             <Body>
+//               {tableList.map((item: ILot) => {
+//                 if (item.type === "lot") {
+//                   return (
+
+//                   );
+//                 } else {
+//                   // @ts-ignore
+//                   const row: IUser = item as IUser;
+
+//                   return (
+
+//                   );
+//                 }
+//               })}
+//             </Body>
+//           </React.Fragment>
+//         );
+//       }}
+//     </ReactTable.Table>
+//   );
+// }
 
 // async function sendEmail(item) {
 //   if (item.type === "lot") {

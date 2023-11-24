@@ -1,7 +1,57 @@
+"use client";
+
+import { collection, onSnapshot } from "firebase/firestore";
+
 import ChartDoughnut from "./components/ChartDoughnut";
+import { useEffect, useState } from "react";
 import Tables from "./components/Table";
+import { IUser } from "@/types/globals";
+import { db } from "@/config";
 
 export default function Page() {
+  const [data, setData] = useState<IUser[] | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "users"), (querySnapshot) => {
+      const data: any = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setData(data);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  if (!data) return <div>Cargando...</div>;
+
+  const stats = {
+    total: 0,
+    emailed: 0,
+    captured: 0,
+    read: 0,
+    clicks: 0,
+    visits: 0,
+  };
+
+  if (data) {
+    stats.total = data.length;
+    stats.emailed = data.filter((user) => user.sended).length;
+    stats.captured = data.filter((user) => user.captured).length;
+    stats.read = data.filter((user) => user.read).length;
+    stats.clicks = data.reduce((acumulador, objetoActual) => {
+      return acumulador + objetoActual.clicks;
+    }, 0);
+    stats.visits = data.reduce((acumulador, objetoActual) => {
+      return acumulador + objetoActual.visits;
+    }, 0);
+  }
+
+  const users = data?.filter((user) => user.captured);
+
   return (
     <div className="relative flex h-screen flex-1 flex-col gap-6 overflow-auto p-7 pt-8">
       <h1 className="border-b border-gray-100 py-2 text-2xl font-semibold">
@@ -13,9 +63,9 @@ export default function Page() {
           <h4 className="text-center font-semibold">Correos entregados</h4>
           <div className="relative h-full">
             <ChartDoughnut
-              data={{ sent: 10, failed: 10 }}
+              data={{ failed: stats.emailed, sent: stats.total }}
+              text={`${stats.emailed}/${stats.total}`}
               color={"blue"}
-              text={`10/10`}
               labels={["Enviados", "No enviados"]}
             />
           </div>
@@ -25,8 +75,8 @@ export default function Page() {
           <h4 className="text-center font-semibold">Informacion capturada</h4>
           <div className="relative h-full">
             <ChartDoughnut
-              data={{ sent: 10, failed: 10 }}
-              text={`10/10`}
+              data={{ failed: stats.captured, sent: stats.total }}
+              text={`${stats.captured}/${stats.total}`}
               labels={["Capturados", "No capturados"]}
             />
           </div>
@@ -35,7 +85,10 @@ export default function Page() {
         <div className="flex flex-col items-center justify-center">
           <h4 className="text-center font-semibold">Correos abiertos</h4>
           <div className="relative h-full">
-            <ChartDoughnut data={{ sent: 10, failed: 10 }} text={`10/10`} />
+            <ChartDoughnut
+              data={{ failed: stats.read, sent: stats.total }}
+              text={`${stats.read}/${stats.total}`}
+            />
           </div>
         </div>
 
@@ -43,9 +96,9 @@ export default function Page() {
           <h4 className="text-center font-semibold">Clics</h4>
           <div className="relative h-full">
             <ChartDoughnut
-              data={{ sent: 10, failed: 10 }}
-              text={`10/10`}
-              color="blue"
+              data={{ failed: stats.clicks, sent: stats.total }}
+              text={`${stats.clicks}/${stats.total}`}
+              color={stats.clicks < stats.total ? "blue" : "red"}
             />
           </div>
         </div>
@@ -54,8 +107,8 @@ export default function Page() {
           <h4 className="text-center font-semibold">Visitas</h4>
           <div className="relative h-full">
             <ChartDoughnut
-              data={{ sent: 10, failed: 10 }}
-              text={`10/10`}
+              data={{ failed: stats.visits, sent: stats.total }}
+              text={`${stats.visits}/${stats.total}`}
               color="blue"
             />
           </div>
@@ -63,117 +116,36 @@ export default function Page() {
       </div>
 
       <div>
-        <Tables values={[]}></Tables>
+        <Tables values={(users && formatData(users)) ?? []}></Tables>
       </div>
     </div>
   );
 }
 
+function formatData(users: IUser[]): any {
+  const format = users.map((user: any) => {
+    user.captureDate = new Date(user.captureDate);
 
-// {
-//   /* <ChartDoughnut
-//               data={{
-//                 sent: statistics.captured_info_no_send,
-//                 failed: statistics.captured_info,
-//               }}
-//               labels={}
-//               text={`${statistics.captured_info}/${
-//                 statistics.mails_delivered + statistics.mails_delivered_no_send
-//               }`}
-//             /> */
-// }
+    return {
+      ...user,
+      nodes: [
+        {
+          browser: user.browser,
+          ip: user.ip,
+          os: user.os,
+          country: user.country,
+          countryCode: user.countryCode,
+          city: user.city,
+          isp: user.isp,
+          sended: user.sended,
+          captured: user.captured,
+        },
+      ],
+    };
+  });
 
-// import { onSnapshot, doc, collection } from "firebase/firestore";
+  return format;
+}
 
-// import Tables from "./components/EngagedUsers";
-// import { ILotTargets } from "../types/shared";
-// import { db } from "../api/firebase.config";
-// import { v4 as uuid } from "uuid";
-
-// const [data, setData] = useState<any>([]);
-// const [statistics, setStatistics] = useState({
-//   mails_delivered: 0,
-//   mails_delivered_no_send: 0,
-//   captured_info: 0,
-//   captured_info_no_send: 0,
-//   mails_read: 0,
-//   mails_no_read: 0,
-//   visits: 0,
-//   clicks: 0,
-// });
-
-// useEffect(() => {
-//   try {
-//     const unsubscribeGraphs = onSnapshot(
-//       doc(db, "statisctics", "visits"),
-//       (querySnapshot) => {
-//         const data = querySnapshot.data();
-//         setStatistics((prevStat: any) => ({ ...prevStat, ...data }));
-//       },
-//     );
-
-//     const unsubscribeUsers = onSnapshot(
-//       collection(db, "users"),
-//       (querySnapshot) => {
-//         const statistics = {
-//           captured_info: 0,
-//           captured_info_no_send: 0,
-//           mails_read: 0,
-//           mails_no_read: 0,
-//         };
-
-//         const users = querySnapshot.docs.map((doc) => {
-//           const userData = doc.data();
-
-//           if (userData.statistics.captured) {
-//             statistics.captured_info++;
-//           } else {
-//             statistics.captured_info_no_send++;
-//           }
-
-//           if (userData.statistics.mail_read) {
-//             statistics.mails_read++;
-//           } else {
-//             statistics.mails_no_read++;
-//           }
-
-//           return { id: doc.id, ...userData };
-//         });
-
-//         setStatistics((prevStat: any) => ({ ...prevStat, ...statistics }));
-//         setData(users);
-//       },
-//     );
-
-//     const unsubscribeLots = onSnapshot(
-//       collection(db, "lots"),
-//       (querySnapshot) => {
-//         const statistics = {
-//           mails_delivered: 0,
-//           mails_delivered_no_send: 0,
-//         };
-//         querySnapshot.docs.map((doc) => {
-//           const lotsData: ILotTargets = doc.data() as any;
-
-//           lotsData.nodes.map((node) => {
-//             if (node.sended) {
-//               statistics.mails_delivered++;
-//             } else {
-//               statistics.mails_delivered_no_send++;
-//             }
-//           });
-//         });
-
-//         setStatistics((prevStat: any) => ({ ...prevStat, ...statistics }));
-//       },
-//     );
-
-//     return () => {
-//       unsubscribeGraphs();
-//       unsubscribeUsers();
-//       unsubscribeLots();
-//     };
-//   } catch (error) {
-//     console.error(error);
-//   }
-// }, []);
+export const dynamic = "force-dynamic";
+export const revalidate = 0;

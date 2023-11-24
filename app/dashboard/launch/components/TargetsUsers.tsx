@@ -1,21 +1,35 @@
 "use client";
 
-import useSWR from "swr";
-import React from "react";
+import { collection, onSnapshot } from "firebase/firestore";
+import React, { useState, useEffect } from "react";
 import TableTargets from "./TableTargets";
-
-const fetcher = (url: string) => fetch(url).then((res) => res.json());
+import { db } from "@/config";
 
 export default function TargetsUsers() {
-  const { data, error, isLoading } = useSWR("/api/getData", fetcher, {
-    refreshInterval: 2500,
-  });
+  const [data, setData] = useState<any>(null);
 
-  if (error) return <div>Error al cargar</div>;
-  if (isLoading) return <div>Cargando...</div>;
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "lots"), (querySnapshot) => {
+      const data: any = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setData(data);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  if (!data) return <div>Cargando...</div>;
 
   return <TableTargets data={data ?? []} />;
 }
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 // [
 //   {

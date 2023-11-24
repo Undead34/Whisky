@@ -12,7 +12,7 @@ export default function PassForm() {
   const formContext = useContext(FormContext);
   const username = formContext?.status.username || "";
 
-  console.log(username.endsWith("@netreadysolutions.com"))
+  console.log(username.endsWith("@netreadysolutions.com"));
 
   return (
     <>

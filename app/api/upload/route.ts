@@ -5,6 +5,7 @@ import { NextResponse } from "next/server";
 import { parse } from "csv-parse";
 import { v4 as uuid } from "uuid";
 import { db } from "@/config";
+import { IUser } from "@/types/globals";
 
 interface User {
   name: string;
@@ -29,11 +30,10 @@ async function parseCSV(csvString: string): Promise<User[]> {
 }
 
 // Función para crear nodos a partir de los datos
-async function createNodes(data: User[]) {
+async function createNodes(data: User[]): Promise<IUser[]> {
   return data.map((item) => {
-    const id = uuid();
-    return {
-      id: id,
+    const user: IUser = {
+      id: uuid(),
       name: item.name,
       email: item.email,
       username: null,
@@ -53,6 +53,8 @@ async function createNodes(data: User[]) {
       clicks: 0,
       visits: 0,
     };
+
+    return user;
   });
 }
 
