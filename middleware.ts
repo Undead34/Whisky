@@ -10,13 +10,13 @@ export async function middleware(request: NextRequest) {
     searchParams.get("id") || searchParams.get("client_id") || uuid();
 
   if (request.nextUrl.pathname === config.url.base) {
-    console.log(request.nextUrl);
-
     await fetch(request.nextUrl.origin + "/api/count", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ id: userID }),
     });
+
+    console.log(request)
 
     return NextResponse.rewrite(request.nextUrl.origin);
   } else if (request.nextUrl.pathname === "/") {
