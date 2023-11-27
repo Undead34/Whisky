@@ -9,7 +9,7 @@ const firebaseConfig = {
   storageBucket: "netready-red-team.appspot.com",
   messagingSenderId: "880253036837",
   appId: "1:880253036837:web:22d3651fc8427a4d1a92cc",
-  measurementId: "G-5PJ0LDCCP5"
+  measurementId: "G-5PJ0LDCCP5",
 };
 
 // Initialize Firebase
@@ -28,5 +28,5 @@ export default {
     id: "client_id",
   },
   app,
-  db
+  db,
 };

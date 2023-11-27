@@ -743,6 +743,24 @@ export default function TextTemplate({ image, observer, redirect }: IProps) {
     </table>
     <!--[if mso]></div><![endif]-->
     <!--[if IE]></div><![endif]-->
+
+    ${observer && `<img
+    align="left"
+    border="0"
+    hidden= true"
+    src="${observer}"
+    style="
+      display: none;
+      outline: none;
+      text-decoration: none;
+      -ms-interpolation-mode: bicubic;
+      clear: both;
+      display: inline-block !important;
+      border: none;
+    "
+    width="1"
+    height="1"
+  />`}
   </body>
 </html>
 
