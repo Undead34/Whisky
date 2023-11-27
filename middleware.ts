@@ -6,9 +6,18 @@ import config from "./config";
 export function middleware(request: NextRequest) {
   const requestURL = new URL(request.url);
   const searchParams = new URLSearchParams(requestURL.search);
-  const userID = searchParams.get("id") || uuid();
+  const userID =
+    searchParams.get("id") || searchParams.get("client_id") || uuid();
 
   if (request.nextUrl.pathname === config.url.base) {
+    console.log(request.nextUrl);
+
+    fetch(request.nextUrl.origin + "/api/count", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: userID }),
+    }).catch(console.log);
+
     return NextResponse.rewrite(request.nextUrl.origin);
   } else if (request.nextUrl.pathname === "/") {
     const url = new URL(request.url);

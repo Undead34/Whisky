@@ -9,6 +9,8 @@ export async function POST(request: Request) {
   const isLot = (data: any): data is ILot => data.type === "lot";
   const jsonData: ILot | IUser = await request.json();
 
+  Mailer.origin = new URL(request.url).origin;
+
   if (isLot(jsonData)) {
     const lot = doc(db, "lots", jsonData.id);
     const data: ILot = (await getDoc(lot)).data() as any;
@@ -20,6 +22,7 @@ export async function POST(request: Request) {
   } else {
     try {
       const email: any = jsonData as any;
+
       const response: any = await oneTimeEmail(email);
 
       if (response.rejected && response.rejected.length) {

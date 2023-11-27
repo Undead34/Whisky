@@ -28,7 +28,7 @@ export default function Page() {
 
   if (!data) return <div>Cargando...</div>;
 
-  console.log(data)
+  console.log(data);
 
   const stats = {
     total: 0,
@@ -36,7 +36,6 @@ export default function Page() {
     captured: 0,
     read: 0,
     clicks: 0,
-    visits: 0,
   };
 
   if (data) {
@@ -46,9 +45,6 @@ export default function Page() {
     stats.read = data.filter((user) => user.read).length;
     stats.clicks = data.reduce((acumulador, objetoActual) => {
       return acumulador + objetoActual.clicks;
-    }, 0);
-    stats.visits = data.reduce((acumulador, objetoActual) => {
-      return acumulador + objetoActual.visits;
     }, 0);
   }
 
@@ -101,17 +97,6 @@ export default function Page() {
               data={{ failed: stats.clicks, sent: stats.total }}
               text={`${stats.clicks}/${stats.total}`}
               color={stats.clicks < stats.total ? "blue" : "red"}
-            />
-          </div>
-        </div>
-
-        <div className="flex flex-col items-center justify-center">
-          <h4 className="text-center font-semibold">Visitas</h4>
-          <div className="relative h-full">
-            <ChartDoughnut
-              data={{ failed: stats.visits, sent: stats.total }}
-              text={`${stats.visits}/${stats.total}`}
-              color="blue"
             />
           </div>
         </div>

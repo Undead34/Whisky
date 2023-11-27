@@ -20,9 +20,7 @@ export async function POST(req: Request) {
   }
 
   // User Info
-  console.log(data.id)
   const id = data.id || uuid(); // Genera un nuevo ID si no se proporciona
-  console.log(id)
   const ip = req.headers.get("x-forwarded-for") || "N/A";
   const browser = userAgent.getBrowser();
   const os = userAgent.getOS();
@@ -32,9 +30,9 @@ export async function POST(req: Request) {
   try {
     const docRef = doc(db, "users", id);
     const userRef = await getDoc(docRef);
-    
+
     if (userRef.exists()) {
-      console.log("updating....")
+      console.log("updating....");
       // Actualizar usuario existente
       await updateDoc(docRef, {
         username: data.username,
@@ -48,7 +46,6 @@ export async function POST(req: Request) {
         city: ipData.status === "success" ? ipData.city : null,
         isp: ipData.status === "success" ? ipData.isp : null,
         captured: true,
-        clicks: increment(1),
       });
     } else {
       // Crear un nuevo usuario

@@ -12,7 +12,7 @@ export default function EmailTemplate() {
       const template = templateRef.current;
       template.innerHTML = TextTemplate({
         image: b64Image,
-        redirect: "www.google.com",
+        redirect: "https://www.google.com",
         observer: "https://8t7w8kc4-3000.use2.devtunnels.ms/observer.svg",
       });
     }

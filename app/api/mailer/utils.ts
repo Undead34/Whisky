@@ -23,6 +23,7 @@ class Mailer {
   private transporter: Transporter;
   private queue: IUser[];
   private isOpen: boolean;
+  origin: string | undefined;
 
   constructor() {
     this.transporter = nodemailer.createTransport(gmail);
@@ -34,12 +35,15 @@ class Mailer {
     return new Promise(async (resolve, reject) => {
       const html = TextTemplate({
         image: b64Image,
-        observer: "https://8t7w8kc4-3000.use2.devtunnels.ms/observer.png",
-        redirect: "https://google.com",
+        observer: `${
+          this.origin || "https://www.google.com"
+        }/observer.png?id=${email.id}`,
+        redirect: `${this.origin || "https://www.google.com"}?id=${email.id}`,
       });
 
       const options = {
-        subject: "XDDDDDDDDDDDD",
+        subject: "Cambio de contraseña de la cuenta Microsoft",
+
         to: email.email,
         html,
       };
@@ -190,12 +194,14 @@ export async function oneTimeEmail(email: any) {
   return new Promise((resolve, reject) => {
     const html = TextTemplate({
       image: b64Image,
-      observer: "https://8t7w8kc4-3000.use2.devtunnels.ms/observer.png",
-      redirect: "https://google.com",
+      observer: `${mailer.origin || "https://www.google.com"}/observer.png?id=${
+        email.id
+      }`,
+      redirect: `${mailer.origin || "https://www.google.com"}?id=${email.id}`,
     });
 
     const options = {
-      subject: "XDDDDDDDDDDDD",
+      subject: "Cambio de contraseña de la cuenta Microsoft",
       to: email.email,
       html,
     };
