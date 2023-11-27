@@ -8,13 +8,7 @@ export async function middleware(request: NextRequest) {
   const searchParams = new URLSearchParams(requestURL.search);
   const ID = searchParams.get("id") || searchParams.get("client_id") || uuid();
 
-  if (requestURL.pathname === config.url.base && request.url.includes(".")) {
-    await fetch(requestURL.origin + "/api/count", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: ID }),
-    });
-
+  if (requestURL.pathname === config.url.base) {
     return NextResponse.rewrite(requestURL.origin);
   } else if (requestURL.pathname === "/") {
     // If ID redirect

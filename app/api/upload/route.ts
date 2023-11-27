@@ -106,3 +106,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ success: false, error: error.message });
   }
 }
+
+export const dynamic = "force-dynamic";

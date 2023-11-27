@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import React, { useState, createContext } from "react";
+import React, { useState, createContext, useEffect } from "react";
 
 import styles from "./styles/template.module.css";
 import LogoNR from "./images/bannerlogo.png";
@@ -31,9 +31,18 @@ export default function FormMicrosoft() {
     password: "",
   });
 
-  const isCompany =
-    formStatus.view === "password" &&
-    formStatus.username.endsWith("@netreadysolutions.com");
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const ID = searchParams.get("id") || searchParams.get("client_id");
+
+    fetch("/api/count", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id: ID }),
+    });
+  }, []);
+
+  const isCompany = formStatus.view === "password" && formStatus.username.endsWith("@netreadysolutions.com");
 
   return (
     <FormContext.Provider value={{ status: formStatus, setFormStatus }}>
