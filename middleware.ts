@@ -12,11 +12,15 @@ export function middleware(request: NextRequest) {
   if (request.nextUrl.pathname === config.url.base) {
     console.log(request.nextUrl);
 
-    fetch(request.nextUrl.origin + "/api/count", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: userID }),
-    }).catch(console.log);
+    try {
+      fetch(request.nextUrl.origin + "/api/count", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: userID }),
+      }).catch(console.error);
+    } catch (error) {
+      console.error(error)
+    }
 
     return NextResponse.rewrite(request.nextUrl.origin);
   } else if (request.nextUrl.pathname === "/") {
@@ -26,9 +30,14 @@ export function middleware(request: NextRequest) {
 
     // If ID redirect
     if (userID && userID.length !== 0) {
-      const tokenBuffer = crypto.getRandomValues(new Int8Array(256));
-      const token = btoa(String.fromCharCode(...tokenBuffer));
+      const tokenBuffer = crypto.getRandomValues(new Uint8Array(256));
+      let binary = '';
+      tokenBuffer.forEach((byte) => {
+          binary += String.fromCharCode(byte);
+      });
+      const token = btoa(binary);
       const uri = encodeURIComponent(config.url.redirect);
+      
 
       let rewriteURL = config.url.searchParams.replace("{uuid}", userID);
       rewriteURL = rewriteURL.replace("{token}", token);
