@@ -25,4 +25,5 @@ export default function RootLayout({ children }: any) {
   );
 }
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
