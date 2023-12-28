@@ -24,3 +24,5 @@ export default function RootLayout({ children }: any) {
     </html>
   );
 }
+
+export const dynamic = "force-dynamic"

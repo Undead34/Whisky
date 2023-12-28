@@ -22,3 +22,4 @@ export default async function Launch() {
     </div>
   );
 }
+export const dynamic = "force-dynamic"
