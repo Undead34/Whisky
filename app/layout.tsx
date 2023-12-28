@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import config from "@/config";
+import { metadata as config } from "@/backend/config";
 import "./globals.css";
 
 export const metadata: Metadata = {

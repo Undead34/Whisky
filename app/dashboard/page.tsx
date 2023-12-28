@@ -1,52 +1,14 @@
 "use client";
 
-import { collection, onSnapshot } from "firebase/firestore";
-
 import ChartDoughnut from "./components/ChartDoughnut";
-import { useEffect, useState } from "react";
+import { IUser } from "@/backend/types/globals";
 import Tables from "./components/Table";
-import { IUser } from "@/types/globals";
-import { db } from "@/config";
+import useStats from "./hooks/useStats";
 
 export default function Page() {
-  const [data, setData] = useState<IUser[] | null>(null);
+  const [stats, isLoading] = useStats();
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "users"), (querySnapshot) => {
-      const data: any = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-
-      setData(data);
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  if (!data) return <div>Cargando...</div>;
-
-  const stats = {
-    total: 0,
-    emailed: 0,
-    captured: 0,
-    read: 0,
-    clicks: 0,
-  };
-
-  if (data) {
-    stats.total = data.length;
-    stats.emailed = data.filter((user) => user.sended).length;
-    stats.captured = data.filter((user) => user.captured).length;
-    stats.read = data.filter((user) => user.read).length;
-    stats.clicks = data.reduce((acumulador, objetoActual) => {
-      return acumulador + objetoActual.clicks;
-    }, 0);
-  }
-
-  const users = data?.filter((user) => user.captured);
+  if (isLoading) return <div>Cargando...</div>;
 
   return (
     <div className="relative flex h-screen flex-1 flex-col gap-6 overflow-auto p-7 pt-8">
@@ -101,14 +63,15 @@ export default function Page() {
       </div>
 
       <div>
-        <Tables values={(users && formatData(users)) ?? []}></Tables>
+        <Tables values={formatData(stats.users)}></Tables>
       </div>
     </div>
   );
 }
 
-function formatData(users: IUser[]): any {
-  const format = users.map((user: any) => {
+function formatData(users: IUser[]): Partial<IUser>[] {
+  const format = users.map((user: Partial<IUser>) => {
+    //@ts-ignore
     user.captureDate = new Date(user.captureDate);
 
     return {

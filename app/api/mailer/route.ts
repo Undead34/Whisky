@@ -1,71 +1,70 @@
 import { NextResponse } from "next/server";
 
-import { setDoc, getDoc, doc, updateDoc } from "firebase/firestore";
-import Mailer, { oneTimeEmail } from "./utils";
-import { db } from "@/config";
-import { ILot, IUser } from "@/types/globals";
+import { IUser, TLot } from "@/backend/types/globals";
+import Database from "@/backend/database";
+import Mailer from "@/backend/mailer";
 
 export async function POST(request: Request) {
-  const isLot = (data: any): data is ILot => data.type === "lot";
-  const jsonData: ILot | IUser = await request.json();
+  try {
+    const data: TLot | IUser = await request.json();
+    const db = new Database();
 
-  Mailer.origin = new URL(request.url).origin;
+    // Check origin
+    if (!Mailer.origin) {
+      Mailer.origin = new URL(request.url).origin;
+    }
 
-  if (isLot(jsonData)) {
-    const lot = doc(db, "lots", jsonData.id);
-    const data: ILot = (await getDoc(lot)).data() as any;
+    if ("type" in data && data.type === "lot") {
+      try {
+        data as TLot;
+        const lots = await db.getLot(data.id);
+        const mails = lots.nodes.map((users: IUser) => {
+          return { email: users.email, id: users.id };
+        });
 
-    Mailer.push(data.nodes, jsonData.id);
-    updateDoc(lot, { sended: true });
+        const end = (success: string[]) => {
+          db.markAsSended(data.id);
+          db.markEmailsAsSent(success, data.id);
+        };
 
-    return NextResponse.json({ success: true });
-  } else {
-    try {
-      const email: any = jsonData as any;
-
-      const response: any = await oneTimeEmail(email);
-
-      if (response.rejected && response.rejected.length) {
+        const mailer = Mailer.getInstance(end);
+        mailer.push(mails);
+      } catch (error) {
+        db.markAsSended(data.id, false);
+        console.log(error);
         return NextResponse.json(
           { status: "fail", message: "ERROR" },
-          { status: 400 }
+          { status: 500 }
         );
       }
-
-      const docRef = doc(db, "lots", email.parentNode.id);
-      const docSnap = await getDoc(docRef);
-
-      if (docSnap.exists()) {
-        const data = docSnap.data() as ILot;
-        const nodes = data.nodes.map((item) => {
-          if (item.id === email.id) {
-            return { ...item, sended: true };
-          }
-          return item;
+    } else {
+      try {
+        const user = data as IUser;
+        const response = await Mailer.sendMail({
+          email: user.email,
+          id: user.id,
         });
-
-        nodes.map(async (item) => {
-          if (item.sended) {
-            await updateDoc(doc(db, "users", item.id), {
-              sended: true,
-            });
-          }
-        });
-
-        await updateDoc(docRef, { nodes: nodes });
+        console.log(response);
+        //@ts-ignore
+        db.markEmailsAsSent([user.id], data.parentNode.id);
+      } catch (error) {
+        return NextResponse.json(
+          { status: "fail", message: "ERROR" },
+          { status: 500 }
+        );
       }
-
-      return NextResponse.json(
-        { status: "success", message: "OK" },
-        { status: 200 }
-      );
-    } catch (error) {
-      console.log(error);
-      return NextResponse.json(
-        { status: "fail", message: "ERROR" },
-        { status: 500 }
-      );
     }
+
+    return NextResponse.json(
+      { status: "success", message: "OK" },
+      { status: 200 }
+    );
+  } catch (error) {
+    console.log(error);
+    return NextResponse.json(
+      { status: "fail", message: "ERROR" },
+      { status: 500 }
+    );
   }
 }
 

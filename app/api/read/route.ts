@@ -1,23 +1,16 @@
-import { db } from "@/config";
-import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { NextResponse } from "next/server";
+import Database from "@/backend/database";
 
 export async function POST(req: Request) {
-  const { id } = await req.json();
-
-  console.log("Image: ", id)
-
   try {
-    const docRef = doc(db, "users", id);
-    const docSnap = await getDoc(docRef);
+    const { id } = await req.json();
 
-    if (docSnap.exists()) {
-      await updateDoc(docRef, { read: true });
-    }
+    const db = new Database();
+    await db.markAsRead(id);
 
     return NextResponse.json({ status: "success" });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return NextResponse.json({ status: "success" }, { status: 500 });
   }
 }

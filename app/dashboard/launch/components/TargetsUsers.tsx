@@ -1,31 +1,15 @@
 "use client";
 
-import { collection, onSnapshot } from "firebase/firestore";
-import React, { useState, useEffect } from "react";
+import useLots from "../../hooks/useLots";
 import TableTargets from "./TableTargets";
-import { db } from "@/config";
+import React from "react";
 
 export default function TargetsUsers() {
-  const [data, setData] = useState<any>(null);
+  const [lots, isLoading] = useLots();
 
-  useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, "lots"), (querySnapshot) => {
-      const data: any = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
+  if (isLoading) return <div>Cargando...</div>;
 
-      setData(data);
-    });
-
-    return () => {
-      unsubscribe();
-    };
-  }, []);
-
-  if (!data) return <div>Cargando...</div>;
-
-  return <TableTargets data={data ?? []} />;
+  return <TableTargets data={lots} />;
 }
 
 export const dynamic = "force-dynamic";

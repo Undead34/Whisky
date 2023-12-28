@@ -12,10 +12,10 @@ import { useState } from "react";
 
 import { SlArrowRight, SlArrowDown } from "react-icons/sl";
 import { FaEye, FaEyeSlash } from "react-icons/fa6";
-import { IUser } from "@/types/globals";
+import { IUser } from "@/backend/types/globals";
 
 interface ITableProps {
-  values: IUser[];
+  values: Partial<IUser>[];
 }
 
 function PasswordCell({ password }: { password: string }) {
@@ -97,6 +97,7 @@ export default function Tables({ values }: ITableProps) {
   const data = { nodes: values };
 
   const tree = useTree(
+    //@ts-ignore
     data,
     {},
     {

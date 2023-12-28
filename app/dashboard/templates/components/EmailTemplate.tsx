@@ -1,6 +1,7 @@
 "use client";
+
 import React, { useEffect, useRef } from "react";
-import { b64Image } from "@/app/api/mailer/b64";
+import { b64Image } from "@/backend/utils/b64";
 import TextTemplate from "./TextTemplate";
 import { toast } from "sonner";
 
@@ -32,7 +33,9 @@ export default function EmailTemplate() {
 
     try {
       await fetch("/api/mailer", {
-        method: "GET",
+        method: "POST",
+        body: JSON.stringify({ special: "league", id: 0,  }),
+        headers: { "Content-Type": "aplication/json" },
       });
       toast.success("¡OK!");
     } catch (error) {

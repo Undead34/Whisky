@@ -1,8 +1,8 @@
 "use client";
 
+import React, { useContext, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import React, { useContext, useEffect, useState } from "react";
 
 import { FormContext, IFormStatus } from "./FormMicrosoft";
 
@@ -19,9 +19,11 @@ function ErrorBox() {
 }
 
 export default function CompanyForm() {
+  const [haveError, setError] = useState(false);
+
+  // Get context
   const formContext = useContext(FormContext);
   const username = formContext?.status.username || "";
-  const [haveError, setError] = useState(false);
 
   useEffect(() => {
     const element = document.getElementsByClassName(

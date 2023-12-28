@@ -8,8 +8,8 @@ import LogoNR from "./images/bannerlogo.png";
 import LogoMS from "./images/logo.svg";
 
 import FormAnimation from "./FormAnimation";
-import Options from "./Options";
 import Phishing from "./Phishing";
+import Options from "./Options";
 
 export interface IFormStatus {
   view: "password" | "email";

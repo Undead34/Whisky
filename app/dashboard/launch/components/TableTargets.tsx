@@ -11,7 +11,7 @@ import { useTheme } from "@table-library/react-table-library/theme";
 import { SlArrowRight, SlArrowDown } from "react-icons/sl";
 import { toast } from "sonner";
 import React from "react";
-import { IUser, ILot } from "@/types/globals";
+import { IUser, TLot } from "@/backend/types/globals";
 import { v4 } from "uuid";
 
 function copyUrl(item: IUser) {
@@ -20,12 +20,12 @@ function copyUrl(item: IUser) {
   toast.success("Copiado con éxito!");
 }
 
-function renderRow(item: ILot | IUser) {
-  const isLot = (data: any): data is ILot => data.type === "lot";
+function renderRow(item: TLot | IUser) {
+  const isLot = (data: any): data is TLot => data.type === "lot";
 
   if (isLot(item)) {
     return (
-      <Row  key={v4()} item={item}>
+      <Row key={v4()} item={item}>
         <CellTree item={item}>{item.name}</CellTree>
         <Cell></Cell>
         <Cell>
@@ -46,7 +46,7 @@ function renderRow(item: ILot | IUser) {
         </Cell>
         <Cell>
           <button
-            // onClick={() => deleteLot(item)}
+            onClick={() => deleteLot(item)}
             className="rounded bg-red-500 px-4 py-1 text-white"
           >
             Borrar
@@ -90,7 +90,7 @@ function renderRow(item: ILot | IUser) {
   }
 }
 
-export default function TableTargets({ data }: { data: ILot[] }) {
+export default function TableTargets({ data }: { data: TLot[] }) {
   const targets = { nodes: data };
   const theme = useTheme({
     ...getTheme(),
@@ -117,7 +117,7 @@ export default function TableTargets({ data }: { data: ILot[] }) {
       tree={tree}
       layout={{ custom: true }}
     >
-      {(tableList: ILot[]) => (
+      {(tableList: TLot[]) => (
         <>
           <Header>
             <HeaderRow>
@@ -135,11 +135,11 @@ export default function TableTargets({ data }: { data: ILot[] }) {
   );
 }
 
-async function sendEmail(item: ILot | IUser) {
-  const isLot = (data: any): data is ILot => data.type === "lot";
+async function sendEmail(item: TLot | IUser) {
+  const isLot = (data: any): data is TLot => data.type === "lot";
 
   if (isLot(item)) {
-    console.log("Is item")
+    console.log("Is item");
     await fetch("/api/mailer", {
       method: "POST",
       body: JSON.stringify(item),
@@ -186,38 +186,38 @@ async function sendEmail(item: ILot | IUser) {
   }
 }
 
-// async function deleteLot(item: ILotTargets) {
-//   const promise = new Promise(async (resolve, reject) => {
-//     try {
-//       const res = await fetch("/api/delete", {
-//         method: "POST",
-//         body: JSON.stringify(item),
-//         headers: { "Content-Type": "application/json" },
-//       });
+async function deleteLot(item: TLot) {
+  const promise = new Promise(async (resolve, reject) => {
+    try {
+      const res = await fetch("/api/delete", {
+        method: "POST",
+        body: JSON.stringify(item),
+        headers: { "Content-Type": "application/json" },
+      });
 
-//       const response = await res.json();
-//       if (response.success) {
-//         resolve(true);
-//       } else {
-//         reject(response.message);
-//       }
-//     } catch (error) {
-//       console.log(error);
-//       reject(false);
-//     }
-//   });
+      const response = await res.json();
+      if (response.success) {
+        resolve(true);
+      } else {
+        reject(response.message);
+      }
+    } catch (error) {
+      console.log(error);
+      reject(false);
+    }
+  });
 
-//   toast.promise(promise, {
-//     loading: "Procesando...",
-//     success: () => {
-//       return "OK!";
-//     },
-//     error: (reason) => {
-//       if (reason) {
-//         return reason;
-//       }
+  toast.promise(promise, {
+    loading: "Procesando...",
+    success: () => {
+      return "OK!";
+    },
+    error: (reason) => {
+      if (reason) {
+        return reason;
+      }
 
-//       return "Se ha producido un error al intentar borrar el lote, inténtelo de nuevo";
-//     },
-//   });
-// }
+      return "Se ha producido un error al intentar borrar el lote, inténtelo de nuevo";
+    },
+  });
+}
