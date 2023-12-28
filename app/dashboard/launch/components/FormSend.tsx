@@ -17,7 +17,7 @@ export default function FormSend() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: targets.trim(), name: lotName.trim() }),
-        cache: "no-store",
+        cache: "no-cache",
       });
 
       if (!response.ok) {

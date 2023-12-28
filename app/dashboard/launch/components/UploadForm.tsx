@@ -27,7 +27,7 @@ export default function UploadForm() {
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
-        cache: "no-store",
+        cache: "no-cache",
       });
 
       if (!response.ok) {
