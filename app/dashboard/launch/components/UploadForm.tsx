@@ -27,6 +27,7 @@ export default function UploadForm() {
       const response = await fetch("/api/upload", {
         method: "POST",
         body: formData,
+        cache: "no-store",
       });
 
       if (!response.ok) {
@@ -76,3 +77,6 @@ export default function UploadForm() {
     </form>
   );
 }
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;

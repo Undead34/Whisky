@@ -17,6 +17,7 @@ export default function FormSend() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ data: targets.trim(), name: lotName.trim() }),
+        cache: "no-store",
       });
 
       if (!response.ok) {
@@ -67,3 +68,6 @@ export default function FormSend() {
     </form>
   );
 }
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
