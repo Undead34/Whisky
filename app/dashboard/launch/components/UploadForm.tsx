@@ -7,6 +7,7 @@ export default function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
     e.preventDefault();
     const lotName = e.currentTarget.lot_name.value.trim();
     if (!file) return;
