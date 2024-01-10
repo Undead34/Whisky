@@ -1,7 +1,6 @@
 "use server";
 
 import { RedirectType, redirect } from "next/navigation";
-import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import UAParser from "ua-parser-js";
 import { v4 as uuid } from "uuid";
@@ -156,6 +155,8 @@ export async function actionSendEmail(state: any, payload: FormData) {
     return { message: "SUCCESS" }
 }
 
+let promise: any;
+
 // Send idividual email
 export async function actionSendEmailLots(state: any, payload: FormData) {
     const id = payload.get("id") as string | undefined;
@@ -167,7 +168,7 @@ export async function actionSendEmailLots(state: any, payload: FormData) {
 
     const emails = await getEmailsByLotID(id);
 
-    const sended = await new Promise((resolve, reject) => {
+    promise = await new Promise((resolve, reject) => {
         async function callback(success: string[]) {
             if (success.length === 0 && emails.length > 0) {
                 reject(false);
@@ -181,9 +182,5 @@ export async function actionSendEmailLots(state: any, payload: FormData) {
         mailer.push(emails);
     })
 
-    if (sended) {
-        return { message: "SUCCESS" }
-    } else {
-        return { message: "ERROR" }
-    }
+    return { message: "SUCCESS" }
 }
