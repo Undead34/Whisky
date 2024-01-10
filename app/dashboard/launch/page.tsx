@@ -1,7 +1,7 @@
-import TargetsUsers from "./components/TargetsUsers";
-import UploadForm from "./components/UploadForm";
-import FormSend from "./components/FormSend";
-import React from "react";
+import { Suspense } from "react";
+
+import TargetsUsers from "@/app/ui/dashboard/launch/targets-users";
+import FormSend from "@/app/ui/dashboard/launch/form-send";
 
 export default async function Launch() {
   return (
@@ -12,14 +12,13 @@ export default async function Launch() {
 
       <div className="flex flex-col gap-4">
         <FormSend />
-        <hr />
-        <UploadForm />
       </div>
 
       <div className="mb-20 flex flex-1 flex-col">
-        <TargetsUsers />
+        <Suspense fallback={<div>Loading...</div>}>
+          <TargetsUsers />
+        </Suspense>
       </div>
     </div>
   );
 }
-export const dynamic = "force-dynamic"

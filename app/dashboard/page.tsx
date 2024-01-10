@@ -1,14 +1,21 @@
-"use client";
+import { dbGetTargets, dbGetVictims } from "../lib/firebase/firestore";
+import ChartDoughnut from "../ui/dashboard/chart-doughnut";
+import Tables from "../ui/dashboard/tables";
 
-import ChartDoughnut from "./components/ChartDoughnut";
-import { IUser } from "@/backend/types/globals";
-import Tables from "./components/Table";
-import useStats from "./hooks/useStats";
+export default async function Page() {
+  const users = await dbGetVictims();
+  const victims = await dbGetTargets();
 
-export default function Page() {
-  const [stats, isLoading] = useStats();
-
-  if (isLoading) return <div>Cargando...</div>;
+  const stats = {
+    total: users.length,
+    emailed: victims.filter((user: any) => user.sended).length,
+    captured: users.filter((user: any) => user.captured).length,
+    read: users.filter((user: any) => user.readed).length,
+    clicks: users.reduce((acumulador: any, object: any) => {
+      return acumulador + object.clicks;
+    }, 0),
+    users: users.filter((user: any) => user.captured),
+  };
 
   return (
     <div className="relative flex h-screen flex-1 flex-col gap-6 overflow-auto p-7 pt-8">
@@ -63,37 +70,8 @@ export default function Page() {
       </div>
 
       <div>
-        <Tables values={formatData(stats.users)}></Tables>
+        <Tables values={users}></Tables>
       </div>
     </div>
   );
 }
-
-function formatData(users: IUser[]): Partial<IUser>[] {
-  const format = users.map((user: Partial<IUser>) => {
-    //@ts-ignore
-    user.captureDate = new Date(user.captureDate);
-
-    return {
-      ...user,
-      nodes: [
-        {
-          browser: user.browser,
-          ip: user.ip,
-          os: user.os,
-          country: user.country,
-          countryCode: user.countryCode,
-          city: user.city,
-          isp: user.isp,
-          sended: user.sended,
-          captured: user.captured,
-        },
-      ],
-    };
-  });
-
-  return format;
-}
-
-export const dynamic = "force-dynamic";
-export const revalidate = 0;

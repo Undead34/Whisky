@@ -1,5 +1,5 @@
 import React from "react";
-import EmailTemplate from "./components/EmailTemplate";
+import EmailTemplate from "@/app/ui/dashboard/templates/email-template";
 
 export default function Templates() {
   return (
@@ -13,6 +13,3 @@ export default function Templates() {
     </div>
   );
 }
-
-export const dynamic = "force-dynamic";
-export const revalidate = 0;

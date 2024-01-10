@@ -1,8 +1,7 @@
+import Sidebar from "../ui/dashboard/sidebar";
 import { Noto_Sans } from "next/font/google";
 import type { Metadata } from "next";
 import { Toaster } from "sonner";
-
-import Sidebar from "./components/Sidebar";
 
 const NotoSans = Noto_Sans({ subsets: ["latin"], weight: "400" });
 
@@ -24,6 +23,3 @@ export default function RootLayout({ children }: any) {
     </html>
   );
 }
-
-export const dynamic = "force-dynamic";
-export const revalidate = 0;

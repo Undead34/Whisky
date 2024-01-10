@@ -1,8 +1,19 @@
-import Template from "./template";
+import styles from "./ui/styles/Home.module.css";
+import Footer from "./ui/footer";
+import Main from "./ui/main";
 
-export default function Home() {
-  return <Template />;
+type TSearchParams = {
+  company?: string;
+  view?: "email" | "password";
+};
+
+export default function Page({ searchParams }: { searchParams: TSearchParams }) {
+  return (
+    <div className="absolute w-screen h-screen">
+      <div className={`${styles.container} ${searchParams?.company === "true" && styles["container-company"]}`}>
+        <Main searchParams={searchParams} />
+        {searchParams?.company !== "true" && <Footer />}
+      </div>
+    </div>
+  )
 }
-
-export const dynamic = "force-dynamic";
-export const revalidate = 0;

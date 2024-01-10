@@ -1,9 +1,0 @@
-.container {
-  @apply flex h-full flex-col relative;
-  background-image: url("https://logincdn.msftauth.net/shared/1.0/content/images/backgrounds/2_bc3d32a696895f78c19df6c717586a5d.svg");
-  background-color: #f2f2f2;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}
-
