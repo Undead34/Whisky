@@ -168,7 +168,7 @@ export async function actionSendEmailLots(state: any, payload: FormData) {
 
     const emails = await getEmailsByLotID(id);
 
-    promise = new Promise((resolve, reject) => {
+    const res = await new Promise((resolve, reject) => {
         async function callback(success: string[]) {
             if (success.length === 0 && emails.length > 0) {
                 reject(false);
@@ -182,5 +182,9 @@ export async function actionSendEmailLots(state: any, payload: FormData) {
         mailer.push(emails);
     })
 
-    return { message: "SUCCESS" }
+    if (res) {
+        return { message: "SUCCESS" }
+    } else {
+        return { message: "ERROR" }
+    }
 }
