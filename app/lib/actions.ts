@@ -168,7 +168,7 @@ export async function actionSendEmailLots(state: any, payload: FormData) {
 
     const emails = await getEmailsByLotID(id);
 
-    promise = await new Promise((resolve, reject) => {
+    promise = new Promise((resolve, reject) => {
         async function callback(success: string[]) {
             if (success.length === 0 && emails.length > 0) {
                 reject(false);
